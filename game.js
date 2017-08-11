@@ -1,6 +1,6 @@
-const height = 120;
-const width  = 120;
-const enemyCnt = 10;
+const height = 320;
+const width  = 320;
+const enemyCnt = 20;
 
 function moveCenter(x) {
     return x + height/2;
@@ -26,11 +26,20 @@ window.onload = function () {
     game.pushScene(gameScene);
 
     let enemys = [];
-    for(let i = 0; i < enemyCnt; i++) {
+    for(let i = 0; i < enemyCnt/2; i++) {
         const enemy = new Sprite(16, 16);
         enemy.backgroundColor = '#777';
-        enemy.r = 50;
-        enemy.t = i * 360 / enemyCnt;
+        enemy.r = 100;
+        enemy.t = i * 360 / (enemyCnt/2);
+        updatePos(enemy);
+        gameScene.addChild(enemy);
+        enemys.push(enemy);
+    }
+    for(let i = 0; i < enemyCnt/2; i++) {
+        const enemy = new Sprite(16, 16);
+        enemy.backgroundColor = '#999';
+        enemy.r = 130;
+        enemy.t = (i + 0.5) * 360 / (enemyCnt/2)
         updatePos(enemy);
         gameScene.addChild(enemy);
         enemys.push(enemy);
