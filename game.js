@@ -1,6 +1,7 @@
-const height = 320;
-const width  = 320;
-const enemyCnt = 20;
+const height = 640;
+const width  = 640;
+const enemyRow = 4;
+const enemyCol = 30;
 
 function moveCenter(x) {
     return x + height/2;
@@ -12,60 +13,112 @@ function updatePos(sprite) {
     sprite.originX = moveCenter(0) - sprite.x;
     sprite.originY = moveCenter(0) - sprite.y;
     sprite.rotation = sprite.t;
-    sprite.debugColor = '#fff';
 }
 
 enchant();
 
 window.onload = function () {
-    const game = new Game(width, height);
-    game.fps = 60;
-    game.scale = 2;
+    const game = new Core(width, height);
+    game.fps = 10;
 
 
     game.onload = function () {
-        const gameScene = new Scene();
-        game.pushScene(gameScene);
+        var RotSprite = enchant.Class.create(enchant.Sprite, {
+            initialize(x, y) {
+                enchant.Sprite.call(this, x, y);
+                this._r = 0;
+                this._t = 0;
+                updatePos(this);
+            },
+
+            r: {
+                get() {
+                    return this._r;
+                },
+                set(_r) {
+                    this._r = _r;
+                    updatePos(this);
+                },
+            },
+
+            t: {
+                get() {
+                    return this._t;
+                },
+                set(_t) {
+                    this._t = _t;
+                    updatePos(this);
+                }
+            }
+        });
+
+        var Player = enchant.Class.create(RotSprite, {
+            initialize() {
+                RotSprite.call(this, 16, 16);
+                this.backgroundColor = '#0f0';
+            },
+        });
+        var Enemy = enchant.Class.create(RotSprite, {
+            initialize() {
+                RotSprite.call(this, 16, 16);
+                this.backgroundColor = '#777';
+            },
+        });
+        var Bullet = enchant.Class.create(RotSprite, {
+            initialize() {
+                RotSprite.call(this, 4, 4);
+                this.backgroundColor = '#f00';
+            },
+        });
+
+        //const gameScene = new Scene();
+        //game.pushScene(gameScene);
+        // FIXME
+        const gameScene = game.rootScene;
 
         let enemys = [];
-        for(let i = 0; i < enemyCnt/2; i++) {
-            const enemy = new Sprite(16, 16);
-            enemy.backgroundColor = '#777';
-            enemy.r = 100;
-            enemy.t = i * 360 / (enemyCnt/2);
-            updatePos(enemy);
-            gameScene.addChild(enemy);
-            enemys.push(enemy);
-        }
-        for(let i = 0; i < enemyCnt/2; i++) {
-            const enemy = new Sprite(16, 16);
-            enemy.backgroundColor = '#999';
-            enemy.r = 130;
-            enemy.t = (i + 0.5) * 360 / (enemyCnt/2)
-            updatePos(enemy);
-            gameScene.addChild(enemy);
-            enemys.push(enemy);
+        for(let r = 0; r < enemyRow; r++) {
+            for(let c = 0; c < enemyCol; c++) {
+                const enemy = new Enemy();
+                enemy.r = 30*r + 200;
+                enemy.t = c * 360 / enemyCol;
+                enemy.tl.clear()
+                    .then( function () {
+                        this.t -= enemyRow * enemyCol / enemys.length;
+                    })
+                    .delay(10)
+                    .loop()
+                gameScene.addChild(enemy);
+                enemys.push(enemy);
+            }
         }
 
-        const player = new Sprite(16, 16);
-        player.r = 0;
+        var player = new Player();
+        player.r = 50;
         player.t = 0;
-        updatePos(player);
-        player.backgroundColor = '#0f0';
+        player.tl
+            .then( function () {
+                if (game.input.left)
+                    this.t--;
+                if (game.input.right)
+                    this.t++;
+            })
+            .delay(1)
+            .loop()
 
-        gameScene.addEventListener('touchstart', function () {
-            const bullet = new Sprite(4, 4);
-            bullet.r = player.r + player.width/2;
-            bullet.t = player.t;
-            updatePos(bullet);
-            bullet.backgroundColor = '#f00';
-
-            bullet.tl
-                .moveBy(1, 0, 2)
-                .loop();
-            gameScene.addChild(bullet);
-        });
         gameScene.addChild(player);
+
+        gameScene.on('touchstart', function () {
+            const bullet = new Bullet();
+            bullet.r = player.r + player.width/2 + bullet.width/2;
+            bullet.t = player.t;
+
+            gameScene.addChild(bullet);
+            bullet.tl
+                .then( function () { this.r += 5 } )
+                .delay(1)
+                .loop();
+        });
     }
 
     game.start();
