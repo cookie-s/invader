@@ -78,10 +78,8 @@ window.onload = function () {
             },
         });
 
-        //const gameScene = new Scene();
-        //game.pushScene(gameScene);
-        // FIXME
-        const gameScene = game.rootScene;
+        const gameScene = new Scene();
+        game.pushScene(gameScene);
 
         var enemyCnt = 0;
         for(let r = 0; r < enemyRow; r++) {
