@@ -24,7 +24,8 @@ window.onload = function () {
     game.onload = function () {
         game.rootScene.backgroundColor = '#000';
         game.keybind(' '.charCodeAt(0), 'a');
-        game.keybind('Z'.charCodeAt(0), 'b');
+        game.keybind('Z'.charCodeAt(0), 'a');
+        game.keybind('X'.charCodeAt(0), 'b');
 
         var RotSprite = enchant.Class.create(enchant.Sprite, {
             initialize(x, y) {
