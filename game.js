@@ -1,17 +1,15 @@
 const height = 640;
 const width  = 640;
 const enemyRow = 4;
-const enemyCol = 30;
+const enemyCol = 15;
 
 function moveCenter(x) {
     return x + height/2;
 }
 
 function updatePos(sprite) {
-    sprite.x = moveCenter(sprite.r) - sprite.width / 2;
-    sprite.y = moveCenter(0) - sprite.height / 2;
-    sprite.originX = moveCenter(0) - sprite.x;
-    sprite.originY = moveCenter(0) - sprite.y;
+    sprite.x = moveCenter(sprite.r * Math.cos(sprite.t * Math.PI / 180)) - sprite.width / 2;
+    sprite.y = moveCenter(sprite.r * Math.sin(sprite.t * Math.PI / 180)) - sprite.height / 2;
     sprite.rotation = sprite.t;
 }
 
@@ -21,8 +19,9 @@ window.onload = function () {
     const game = new Core(width, height);
     game.fps = 10;
 
-
     game.onload = function () {
+        game.keybind(' '.charCodeAt(0), 'a');
+
         var RotSprite = enchant.Class.create(enchant.Sprite, {
             initialize(x, y) {
                 enchant.Sprite.call(this, x, y);
@@ -81,7 +80,7 @@ window.onload = function () {
             for(let c = 0; c < enemyCol; c++) {
                 const enemy = new Enemy();
                 enemy.r = 30*r + 200;
-                enemy.t = c * 360 / enemyCol;
+                enemy.t = c * -120 / enemyCol - 30;
                 enemy.tl.clear()
                     .then( function () {
                         this.t -= enemyRow * enemyCol / enemys.length;
@@ -95,7 +94,7 @@ window.onload = function () {
 
         var player = new Player();
         player.r = 50;
-        player.t = 0;
+        player.t = -90;
         player.tl
             .then( function () {
                 if (game.input.left)
@@ -108,7 +107,7 @@ window.onload = function () {
 
         gameScene.addChild(player);
 
-        gameScene.on('touchstart', function () {
+        function makeBullet() {
             const bullet = new Bullet();
             bullet.r = player.r + player.width/2 + bullet.width/2;
             bullet.t = player.t;
@@ -118,6 +117,16 @@ window.onload = function () {
                 .then( function () { this.r += 5 } )
                 .delay(1)
                 .loop();
+        }
+
+        gameScene.on('touchstart', makeBullet);
+        gameScene.on('abuttondown', makeBullet);
+
+        gameScene.on('enterframe', function () {
+            for(const [enemy, bullet] of (Enemy.intersect(Bullet))) {
+                gameScene.removeChild(enemy);
+                gameScene.removeChild(bullet);
+            }
         });
     }
 
