@@ -19,6 +19,7 @@ enchant();
 window.onload = function () {
     const game = new Core(width, height);
     game.fps = 60;
+    game.scale = 0.75;
     var frameindex = 0;
 
     game.onload = function () {
