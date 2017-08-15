@@ -221,7 +221,7 @@ window.onload = function () {
 
                 if(enemyCnt == 0) {
                     game.stop();
-                    alert('congrats!!!!!');
+                    alert('congrats!!!!');
                 }
             });
         });
