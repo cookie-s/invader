@@ -109,6 +109,9 @@ window.onload = function () {
             });
             menuScene.addChild(label);
         } (titleLabel);
+        menuScene.on('abuttondown', function () {
+            game.replaceScene(gameScene);
+        });
         game.pushScene(menuScene);
 
         gameScene.on('enter', function () {
